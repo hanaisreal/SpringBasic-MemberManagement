@@ -10,8 +10,13 @@ import hello.core.order.OrderServiceImpl;
 public class OrderApp {    //test without using Junit
 
     public static void main(String[] args) {
-        MemberService memberService = new MemberServiceImpl();
-        OrderService orderService = new OrderServiceImpl();
+
+        AppConfig appConfig = new AppConfig();
+        MemberService memberService = appConfig.memberService();
+        OrderService orderService = appConfig.orderService();
+
+//        MemberService memberService = new MemberServiceImpl();  구체 글래스에 의존하는 코드
+//        OrderService orderService = new OrderServiceImpl();
 
         long memberId = 1L;
         Member member = new Member(memberId, "memberA", Grade.VIP);
