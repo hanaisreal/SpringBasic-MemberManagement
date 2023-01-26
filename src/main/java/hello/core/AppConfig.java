@@ -9,6 +9,8 @@ import hello.core.member.MemberServiceImpl;
 import hello.core.member.MemoryMemberRepository;
 import hello.core.order.OrderService;
 import hello.core.order.OrderServiceImpl;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 public class AppConfig {
 
@@ -17,7 +19,7 @@ public class AppConfig {
         return new MemberServiceImpl(memberRepository());
     }
 
-    private MemberRepository memberRepository() {
+    public MemberRepository memberRepository() {
         return new MemoryMemberRepository();
     }
 
@@ -25,7 +27,7 @@ public class AppConfig {
         return new OrderServiceImpl(memberRepository(), getDiscountPolicy());
     }
 
-    private DiscountPolicy getDiscountPolicy() {
+    public DiscountPolicy getDiscountPolicy() {
         //return new FixDiscountPolicy();
         return new RateDiscountPolicy();  //여기서만 FixDiscountPolicy에서 바꾸면 된다!
     }
