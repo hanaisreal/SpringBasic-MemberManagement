@@ -12,21 +12,26 @@ import hello.core.order.OrderServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class AppConfig {
 
     //역할과 구현 클래스가 한눈에 들어온다.
+    @Bean
     public MemberService memberService() {
         return new MemberServiceImpl(memberRepository());
     }
 
+    @Bean
     public MemberRepository memberRepository() {
         return new MemoryMemberRepository();
     }
 
+    @Bean
     public OrderService orderService(){
         return new OrderServiceImpl(memberRepository(), getDiscountPolicy());
     }
 
+    @Bean
     public DiscountPolicy getDiscountPolicy() {
         //return new FixDiscountPolicy();
         return new RateDiscountPolicy();  //여기서만 FixDiscountPolicy에서 바꾸면 된다!
