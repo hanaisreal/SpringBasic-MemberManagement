@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class OrderServiceImpl implements OrderService{
 
     private final MemberRepository memberRepository;
-    private final DiscountPolicy discountPolicy;  //단일 체계 원칙을 잘 지켰다.
+    private final DiscountPolicy discountPolicy;
 
     //생성자 주입, AppConfig에서 넣어준다.
     @Autowired
@@ -24,11 +24,21 @@ public class OrderServiceImpl implements OrderService{
         this.discountPolicy = discountPolicy;
     }
 
-    //수정자 자동 주입
+    //수정자 자동 주입에서는 final을 빼줘야한다.
+//    private MemberRepository memberRepository;
+//    private DiscountPolicy discountPolicy;
+//
 //    @Autowired
-//    public DiscountPolicy setDiscountPolicy(@MainDiscountPolicy DiscountPolicy discountPolicy) {
+//    public void setMemberRepository(MemberRepository memberRepository) {
+//        this.memberRepository = memberRepository;
+//    }
+//    @Autowired
+//    public void setDiscountPolicy(DiscountPolicy discountPolicy) {
 //        this.discountPolicy = discountPolicy;
 //    }
+
+
+
 
     @Override
     public Order createOrder(Long memberId, String itemName, int itemPrice) {
