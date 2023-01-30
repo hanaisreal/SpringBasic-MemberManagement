@@ -1,8 +1,8 @@
 package hello.core.beanfind;
 
-import hello.core.discount.DiscountPolicy;
-import hello.core.discount.FixDiscountPolicy;
-import hello.core.discount.RateDiscountPolicy;
+import hello.core.AppConfig;
+import hello.core.member.MemberRepository;
+import hello.core.member.MemoryMemberRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,68 +13,54 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ApplicationContextExtendsFindTest {
-    AnnotationConfigApplicationContext ac = new
-            AnnotationConfigApplicationContext(TestConfig.class);
+public class ApplicationContextSameBeanFindTest {
+    AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(SameBeanConfig.class);
+
+    @Test
+    @DisplayName("타입으로 조회시 같은 타입이 둘 이상 있으면, 중복 오류가 발생한다")
+    void findBeanByTypeDuplicate(){
+        //MemberRepository bean = ac.getBean(MemberRepository.class);  //에러 터짐: NoUniqueBeing
+        assertThrows(NoUniqueBeanDefinitionException.class, () -> ac.getBean(MemberRepository.class));
+
+    }
+
+    @Test
+    @DisplayName("타입으로 조회시 같은 타입이 둘 이상 있으면, 빈 이름을 지정하면 된다")
+    void findBeanByName() {
+        MemberRepository memberRepository = ac.getBean("memberRepository1", MemberRepository.class);
+        assertThat(memberRepository).isInstanceOf(MemberRepository.class);
+    }
+
+    @Test
+    @DisplayName("특정 타입을 모두 조회하기")
+    void findAllBeanByType() {
+        Map<String, MemberRepository> beansofType = ac.getBeansOfType(MemberRepository.class);
+        for (String key : beansofType.keySet()) {
+            System.out.println("key = " + key + "value = " + beansofType.get(key));
+        }
+        System.out.println("beansOfType = " + beansofType);
+        assertThat(beansofType.size()).isEqualTo(2);
+    }
 
     @Configuration
-    static class TestConfig {
-        @Bean
-        public DiscountPolicy rateDiscountPolicy(){
-            return new RateDiscountPolicy();
-        }
+    static class SameBeanConfig {  //class 안에 class는 이 클래스을 안에서만 사용한다는 뜻, 중복이 존재하는 타입을 만듬
 
         @Bean
-        public DiscountPolicy fixDiscountPolicy(){
-            return new FixDiscountPolicy();
+        public MemberRepository memberRepository1() {
+            return new MemoryMemberRepository();
         }
-    }
 
-    @Test
-    @DisplayName("부모 타입으로 조회시, 자식이 둘 이상 있으면, 중복 오류가 발생한다") void findBeanByParentTypeDuplicate() {
-        //DiscountPolicy bean = ac.getBean(DiscountPolicy.class);
-        assertThrows(NoUniqueBeanDefinitionException.class, () ->
-                ac.getBean(DiscountPolicy.class));
-    }
-
-    @Test
-    @DisplayName("부모 타입으로 조회시, 자식이 둘 이상 있으면, 빈 이름을 지정하면 된다")
-    void findBeanByParentTypeBeanName(){
-        //DiscountPolicy rateDiscountPolicy = ac.getBean("rateDiscountPolicy", DiscountPolicy.class);
-        assertThrows(NoUniqueBeanDefinitionException.class,
-                () -> ac.getBean(RateDiscountPolicy.class));
-    }
-
-    @Test
-    @DisplayName("특정 허위 타입으로 조회")
-    void findAllBeanBySubType() {
-        RateDiscountPolicy bean = ac.getBean(RateDiscountPolicy.class);
-        Assertions.assertThat(bean).isInstanceOf(RateDiscountPolicy.class);
-    }
-
-    @Test
-    @DisplayName("부모 타입으로 모두 조회하기")
-    void findAllBeanByParentType() {
-        Map<String, DiscountPolicy> beansOfType =
-                ac.getBeansOfType(DiscountPolicy.class);
-        Assertions.assertThat(beansOfType.size()).isEqualTo(2);
-        for (String key : beansOfType.keySet()) {
-            System.out.println("key = " + key + " value=" +
-                    beansOfType.get(key));
+        @Bean
+        public MemberRepository memberRepository2() {
+            return new MemoryMemberRepository();
         }
+
+
+
+
+
     }
-
-    @Test
-    @DisplayName("부모 타입으로 모두 조회하기 - Object")
-    void findAllBeanByObjectType() {
-        Map<String, Object> beansOfType = ac.getBeansOfType(Object.class);
-        for (String key : beansOfType.keySet()) {
-            System.out.println("key = " + key + " value=" +
-                    beansOfType.get(key));
-        }
-    }
-
-
 }
